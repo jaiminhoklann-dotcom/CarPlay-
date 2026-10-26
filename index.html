@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#05070a">
+<link rel="manifest" href="manifest.json">
+<title>Car Central</title>
+<style>
+:root{--bg:#05070a;--card:#0d131b;--line:#1e2a38;--text:#f7f9fc;--muted:#9ca9bb;--blue:#1687ff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#000;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}
+button,a{font:inherit}
+#app{height:100dvh;padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));background:radial-gradient(circle at 25% 15%,#102035 0,#05070a 42%,#000 100%)}
+.home{height:100%;display:grid;grid-template-columns:minmax(0,2.35fr) minmax(260px,1fr);gap:14px}
+.map{position:relative;border:1px solid #223044;border-radius:28px;overflow:hidden;background:
+radial-gradient(circle at 30% 35%,rgba(24,135,255,.16),transparent 28%),
+linear-gradient(125deg,#07111d,#0b1621 55%,#071018)}
+.map:before,.map:after{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(28deg,transparent 0 45px,rgba(88,108,130,.13) 46px 49px,transparent 50px 95px);transform:rotate(-5deg)}
+.map:after{transform:rotate(65deg);opacity:.6}
+.route{position:absolute;z-index:2;left:48%;top:9%;height:82%;width:18px;background:linear-gradient(#14a7ff,#075eff);border-radius:18px;box-shadow:0 0 24px #087dff;transform:rotate(2deg)}
+.route:after{content:"";position:absolute;bottom:-5px;left:-16px;border-left:25px solid transparent;border-right:25px solid transparent;border-bottom:52px solid #31a8ff;filter:drop-shadow(0 0 8px #148cff)}
+.turn{position:absolute;z-index:4;top:24px;left:24px;background:rgba(3,7,12,.92);border-radius:22px;padding:20px 24px;min-width:330px;box-shadow:0 12px 30px #0008}
+.turn b{font-size:42px}.turn span{display:block;color:#1ba7ff;font-size:24px;font-weight:700;margin-top:6px}.turn small{display:block;font-size:20px;margin-top:4px;color:#d9e0ea}
+.speed{position:absolute;z-index:4;left:24px;bottom:100px;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;background:#05080d;border:2px solid #273342;font-size:30px;font-weight:800}.speed small{font-size:13px;font-weight:600}
+.road{position:absolute;z-index:4;left:50%;bottom:118px;transform:translateX(-50%);background:#075df3;border-radius:28px;padding:10px 22px;font-size:22px}
+.trip{position:absolute;z-index:4;left:18px;right:18px;bottom:18px;background:rgba(3,7,12,.94);border-radius:22px;padding:15px 22px;font-size:19px}.trip b{color:#19dc68;font-size:30px;margin-right:18px}
+.apps{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:14px}
+.tile{border:1px solid var(--line);border-radius:26px;background:linear-gradient(145deg,#111923,#090d13);color:white;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;cursor:pointer;min-height:0}
+.tile:active{transform:scale(.98)}
+.icon{width:min(94px,35%);aspect-ratio:1;border-radius:24%;display:grid;place-items:center;font-size:44px;font-weight:900;box-shadow:0 10px 30px #0008}
+.yt{background:#ff0820}.ym{background:#f20b26;border-radius:50%}.wa{background:#19d85b}.siri{background:radial-gradient(circle at 35% 30%,#fff 0 4%,#38d8ff 15%,#7c31ff 38%,#ef2b9d 58%,#111 75%)}.gear{background:#18202a}
+.tile strong{font-size:clamp(15px,2vw,24px)}.settings{grid-column:1/3}
+.full{display:none;position:absolute;inset:0;background:#05070a;z-index:20;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+.full.show{display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#101721;border:1px solid #25354a;border-radius:20px;padding:10px 14px}
+.top h2{margin:0;font-size:22px}.top button{border:0;border-radius:14px;background:#202c3c;color:white;padding:12px 18px;font-weight:700}
+.content{flex:1;display:grid;place-items:center;text-align:center;padding:28px}.content .big{font-size:clamp(60px,12vw,140px)}.content h1{font-size:clamp(28px,5vw,60px);margin:12px}.launch{display:inline-block;border:0;border-radius:18px;background:#147cff;color:#fff;padding:16px 26px;text-decoration:none;font-weight:800;font-size:20px}
+.hint{max-width:650px;color:var(--muted);line-height:1.5}
+#settingsPanel .content{display:block;text-align:left;overflow:auto}.setting{max-width:720px;margin:0 auto 14px;background:#101721;border:1px solid #243247;border-radius:20px;padding:18px}.setting label{display:flex;justify-content:space-between;gap:20px;align-items:center}.setting input[type=range]{width:45%}
+@media(max-width:760px){.home{grid-template-columns:1.65fr 1fr;gap:8px}.apps{gap:8px}.turn{min-width:0;right:18px}.turn b{font-size:26px}.turn span{font-size:18px}.turn small{font-size:15px}.tile{border-radius:18px}.icon{font-size:28px}.road{font-size:16px}.settings{grid-column:auto}.apps{grid-template-columns:1fr}.settings{grid-column:1}.tile strong{font-size:13px}}
+</style>
+</head>
+<body>
+<div id="app">
+  <main class="home" id="home">
+    <section class="map" id="mapArea">
+      <div class="route"></div>
+      <div class="turn"><b>↗ 2,5 km</b><span>Saída 23</span><small>Av. das Nações</small></div>
+      <div class="speed">90<br><small>km/h</small></div>
+      <div class="road">Rod. Anhanguera</div>
+      <div class="trip"><b>32 min</b> 28 km &nbsp; • &nbsp; 20:47</div>
+    </section>
+    <section class="apps">
+      <button class="tile" onclick="openPanel('youtube')"><span class="icon yt">▶</span><strong>YouTube</strong></button>
+      <button class="tile" onclick="openPanel('music')"><span class="icon ym">▶</span><strong>YouTube Music</strong></button>
+      <button class="tile" onclick="openPanel('whatsapp')"><span class="icon wa">◔</span><strong>WhatsApp</strong></button>
+      <button class="tile" onclick="openPanel('siri')"><span class="icon siri">✦</span><strong>Siri</strong></button>
+      <button class="tile settings" onclick="openPanel('settingsPanel')"><span class="icon gear">⚙</span><strong>Configurações</strong></button>
+    </section>
+  </main>
+
+  <section class="full" id="youtube"><div class="top"><h2>▶ YouTube</h2><button onclick="minimize()">— Minimizar</button></div><div class="content"><div><div class="big">▶️</div><h1>YouTube</h1><a class="launch" href="youtube://">Abrir YouTube</a><p class="hint">O botão abre o aplicativo instalado. Ao voltar para esta central, a tela principal permanece pronta.</p></div></div></section>
+  <section class="full" id="music"><div class="top"><h2>◉ YouTube Music</h2><button onclick="minimize()">— Minimizar</button></div><div class="content"><div><div class="big">🔴</div><h1>YouTube Music</h1><a class="launch" href="youtubemusic://">Abrir YouTube Music</a></div></div></section>
+  <section class="full" id="whatsapp"><div class="top"><h2>WhatsApp</h2><button onclick="minimize()">— Minimizar</button></div><div class="content"><div><div class="big">🟢</div><h1>WhatsApp</h1><a class="launch" href="whatsapp://">Abrir WhatsApp</a></div></div></section>
+  <section class="full" id="siri"><div class="top"><h2>✦ Siri</h2><button onclick="minimize()">— Minimizar</button></div><div class="content"><div><div class="big">✦</div><h1>Siri</h1><p class="hint">No iPhone, use “Siri”/“E aí Siri” ou mantenha o botão lateral pressionado. Sites não recebem permissão para ligar a Siri diretamente.</p></div></div></section>
+  <section class="full" id="settingsPanel"><div class="top"><h2>⚙ Configurações</h2><button onclick="minimize()">— Voltar</button></div><div class="content">
+    <div class="setting"><label><b>Tamanho do mapa</b><input id="mapSize" type="range" min="55" max="82" value="70"></label></div>
+    <div class="setting"><label><b>Mostrar YouTube</b><input data-tile="0" type="checkbox" checked></label></div>
+    <div class="setting"><label><b>Mostrar YouTube Music</b><input data-tile="1" type="checkbox" checked></label></div>
+    <div class="setting"><label><b>Mostrar WhatsApp</b><input data-tile="2" type="checkbox" checked></label></div>
+    <div class="setting"><label><b>Mostrar Siri</b><input data-tile="3" type="checkbox" checked></label></div>
+    <div class="setting"><p class="hint">As preferências ficam salvas neste aparelho.</p></div>
+  </div></section>
+</div>
+<script>
+const panels=[...document.querySelectorAll('.full')];
+function openPanel(id){panels.forEach(p=>p.classList.remove('show'));document.getElementById(id).classList.add('show')}
+function minimize(){panels.forEach(p=>p.classList.remove('show'))}
+const range=document.getElementById('mapSize');
+function setMapSize(v){document.querySelector('.home').style.gridTemplateColumns=`${v}fr ${100-v}fr`;localStorage.setItem('mapSize',v)}
+range.value=localStorage.getItem('mapSize')||70; setMapSize(range.value);
+range.oninput=e=>setMapSize(e.target.value);
+document.querySelectorAll('[data-tile]').forEach(cb=>{
+ const i=cb.dataset.tile, key='tile'+i; cb.checked=localStorage.getItem(key)!=='0';
+ document.querySelectorAll('.apps .tile')[i].style.display=cb.checked?'flex':'none';
+ cb.onchange=()=>{localStorage.setItem(key,cb.checked?'1':'0');document.querySelectorAll('.apps .tile')[i].style.display=cb.checked?'flex':'none'}
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body></html>
